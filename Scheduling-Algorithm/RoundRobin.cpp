@@ -1,5 +1,5 @@
 /*
-    Age Ashle Age Paben - First Come First Serve
+    "Shobai k Shoman vabe Ektu Ektu kore Bhalobasha Biliye Dibo" - Round Robin
     Akif Islam
     11 July 2023
 */
@@ -19,41 +19,14 @@ struct process{
 int no_of_process;
 vector<process> vec(1000);
 
-void put_dash(int count){
-    for (int i = 0; i < count; i++)
-    {
-        cout<<"-";
-    }  
-}
-
-void put_space(int count){
-    for (int i = 0; i < count; i++)
-    {
-        cout<<" ";
-    }  
-}
-
-void gant_chart_maker(){
-    for (int i = 0; i < no_of_process; i++)
-    {
-        put_space(vec[i].waitingtime);//
-        cout<<vec[i].processID;//P1
-        put_dash(vec[i].burst);//P1-----------13
-        cout<<vec[i].turnaround<<endl;
-    }
-    
-}
-
-
-
 // This function is just for debug, not for production/exam
 void emergency_print(){
     cout<<"__________________________________________________________________"<<endl;
-    cout<<"PID\t\tBURST\t\tWAITING\t\tTAROUND"<<endl;   
+    cout<<"PID\t\tTAROUND"<<endl;   
     
     for (int i = 0; i < no_of_process; i++)
     {
-        cout<<vec[i].processID<<"\t\t"<<vec[i].burst<<"\t\t"<<vec[i].waitingtime<<"\t\t"<<vec[i].turnaround<<endl;   
+        cout<<vec[i].processID<<"\t\t"<<vec[i].turnaround<<endl;   
     }
     cout<<"__________________________________________________________________"<<endl;
     
@@ -67,20 +40,45 @@ int main(){
 
     
     //Input
-    for (int i = 0; i < no_of_process; i++)
+    int total_burst = 0;
+    for (int i = 0; i < no_of_process; i++){
         cin>>vec[i].processID>>vec[i].burst;
+        total_burst+=vec[i].burst;
+    }
+    
+    int time_quantum;
+    cin>>time_quantum;
+    
     
     //Calculating Waiting and Turnaround Time
     int clock_time = 0;
+   
+    vector<string> gant_chart;
 
-    for (int i = 0; i < no_of_process; i++)
+    for (int i = 0; i < 1000; i++)
     {
-        vec[i].waitingtime = clock_time; //Karon Prothom Process k kono wait korte hoyna
-        clock_time+=vec[i].burst; // Prothom Process Finish Ho gayi
-        vec[i].turnaround = clock_time; //So, TurnAround Time Save kar diya :p  
+        if(vec[i%no_of_process].burst<=0)
+            continue;
+
+        clock_time+=min(vec[i%no_of_process].burst,time_quantum);
+
+        if(vec[i%no_of_process].burst>time_quantum){
+            gant_chart.push_back(vec[i%no_of_process].processID);
+            vec[i%no_of_process].burst-=time_quantum;
+        }
+        else{
+            vec[i%no_of_process].turnaround = clock_time;
+            vec[i%no_of_process].burst-=time_quantum;
+            gant_chart.push_back(vec[i%no_of_process].processID);
+        }
     }
     
-    gant_chart_maker();
+       
+    for (int i = 0; i < gant_chart.size(); i++)
+    {
+        cout<<gant_chart[i]<<" ";
+    }
+    cout<<endl;
     emergency_print();
-      
+    return 0;
 }
